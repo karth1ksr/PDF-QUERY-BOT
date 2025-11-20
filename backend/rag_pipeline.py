@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langgraph.graph import StateGraph
-from langchain_core.messages import HumanMessage, AIMessage
 from typing import TypedDict, List
 
 load_dotenv()
@@ -109,4 +108,3 @@ def build_chat_graph():
     app = workflow.compile()
 
     return app
-
