@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-FASTAPI_URL = "http//127.0.0.1:8000"
+FASTAPI_URL = "http://127.0.0.1:8000"
 
 st.set_page_config(page_title="PDF Query Bot", layout="wide")
 
@@ -20,6 +20,10 @@ if "chat_history" not in st.session_state:
 uploaded_file = st.file_uploader("Upload your PDF", type=["pdf"])
 
 if uploaded_file and st.session_state.session_id is None:
+
+    if uploaded_file.size > 5 * 1024 * 1024:
+        st.error("PDF too large! Max allowed size is 5 MB.")
+        st.stop()
     
     with st.spinner("Processing PDF..."):
         files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}

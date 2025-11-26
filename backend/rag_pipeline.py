@@ -1,10 +1,14 @@
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+import os
 from dotenv import load_dotenv
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PyPDFLoader
-from langgraph.graph import StateGraph
+from tempfile import NamedTemporaryFile
 from typing import TypedDict, List
+from pydantic import Field, root_validator
+
+from langchain_community.vectorstores import Chroma
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langgraph.graph import StateGraph
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 load_dotenv()
 
@@ -26,7 +30,6 @@ class ChatState(TypedDict):
 # Creating vectors from the uploaded pdf bytes
 def create_vector_from_pdf(pdf_bytes):
     """ Takes PDF bytes -> return in-memory Chroma vectorstore"""
-    from tempfile import NamedTemporaryFile
     tmp = NamedTemporaryFile(delete=False, suffix=".pdf")
     tmp.write(pdf_bytes)
     tmp.flush()
