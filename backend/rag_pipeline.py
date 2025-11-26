@@ -94,7 +94,9 @@ def answer_query(state: ChatState):
     response = llm.invoke(prompt)
     answer = response.content
 
-    return {"messages": history + [{"type":"ai", "content": answer}]}
+    return {"context": ctx,
+            "messages": history + [{"type":"ai", "content": answer}],
+            "db": state["db"]}
 
 #Building Graph to store ephemeral memory
 
