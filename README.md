@@ -1,103 +1,108 @@
 # PDF-Query-Bot
-A lightweight RAG chatbot for querying your PDFs using Gemini models. Upload a PDF, get a session ID, and chat with your document via simple POST endpoints. Built with FastAPI backend, LangGraph for stateful conversations, and Streamlit frontend.
 
-# Features
-PDF to RAG: Converts uploaded PDFs to Chroma vector store with Gemini embeddings
+A lightweight Retrieval-Augmented Generation (RAG) chatbot designed for querying PDF documents using Gemini models. This project allows users to upload a PDF, receive a unique session ID, and engage in a stateful conversation with the document via RESTful API endpoints.
 
-Session-Based Chat: In-memory session management with conversation history
+## Features
 
-LangGraph Pipeline: Retrieve → Answer workflow with ephemeral memory
+* **PDF to RAG**: Converts uploaded PDFs to a Chroma vector store using Gemini embeddings.
+* **Session-Based Chat**: In-memory session management with conversation history.
+* **LangGraph Pipeline**: A structured Retrieve → Answer workflow with ephemeral memory.
+* **Gemini 2.5 Flash**: Fast, context-aware responses without the need for local LLMs.
+* **Simple API**: Dedicated endpoints for `/upload_pdf`, `/chat`, and `/reset`.
+* **Streamlit UI**: A clean frontend interface for testing and interaction.
 
-Gemini 2.5 Flash: Fast, context-aware responses (no local LLM needed)
+---
 
-Simple API: /upload_pdf → /chat → /reset endpoints
+## Quick Start
 
-Streamlit UI: Clean frontend for testing
+### Prerequisites
 
-*Quick Start*
+Ensure you have Python installed, then install the required dependencies:
 
-Prerequisites
-
-bash
+```bash
 pip install streamlit fastapi python-multipart python-dotenv langchain-google-genai langgraph chromadb pypdf
-1. Setup Environment
+```
+# 1. Setup Environment
+Create a .env file from the example and add your API key:
 
-bash
+```bash
 cp .env.example .env
-**Add your GOOGLE_API_KEY to .env**
+# Add your GOOGLE_API_KEY to .env
+```
 
-2. Run Backend
-bash
+# 2. Run Backend
+Start the FastAPI server:
+
+```bash
 uvicorn main:app --reload --port 8000
+```
 
 3. Run Frontend
-bash
+Start the Streamlit application:
+
+```bash
 streamlit run frontend.py
-Visit http://localhost:8501 to start querying PDFs!
+```
+Visit http://localhost:8501 to start querying your documents.
 
-*API Usage*
+# API Usage
+## 1. Upload PDF
+Endpoint: POST /upload_pdf
 
-bash
-**1. Upload PDF**
+```bash
 curl -X POST -F "file=@document.pdf" http://localhost:8000/upload_pdf
-**Returns: {"session_id": 123456, "message": "PDF processed successfully."}**
+```
+Returns: {"session_id": 123456, "message": "PDF processed successfully."}
 
-**2. Chat**
+## 2. Chat
+Endpoint: POST /chat
+
+```bash
 curl -X POST "http://localhost:8000/chat" \
   -d "session_id=123456" \
   -d "query=What is the main topic?"
+```
 
-**3. Reset session**
+## 3. Reset Session
+Endpoint: POST /reset
+
+```bash
 curl -X POST "http://localhost:8000/reset" -d "session_id=123456"
+```
 
-**How It Works**
-Upload PDF → Creates Chroma vectorstore from chunks (1200 chars, 150 overlap)
+# How It Works
 
-Session Created → Stores db, graph, messages in SESSIONS[session_id]
-
-**Chat Flow:**
-
-text
-Query → retrieve_context() → answer_query() → Response
-          ↓                    ↓
-    Vector search (k=4)    Gemini 2.5 + history
-State Managed → LangGraph preserves conversation across turns
+1. **Ingestion:** Uploaded PDFs are split into chunks (1200 characters with 150-character overlap) and stored in a Chroma vector store.
+2. **Session Management:** A session is created in the SESSIONS dictionary, storing the database instance, the LangGraph workflow, and message history.
+3. **Chat Flow:** 
+    **Query:** User sends a prompt.retrieve_context(): Performs a vector search ($k=4$) to find relevant document sections.
+    **answer_query():** Gemini 2.5 Flash generates a response using the context and history.
+4. **State Management:** LangGraph preserves the conversation state across multiple turns.
 
 # Configuration
-Edit .env:
 
-text
-GOOGLE_API_KEY=your_key_here
-**Session Management**
-In-Memory: SESSIONS = {} dictionary (resets on restart)
+## Session Management
+**In-Memory:** The SESSIONS = {} dictionary resets whenever the server restarts.
 
-Session ID: Auto-generated from vectorstore object ID
+**Session ID:** Automatically generated from the vector store object ID.
 
-Reset: POST /reset clears specific session
+**Multi-User:** For production, extend the SESSIONS logic to use a persistent store like Redis.
 
-Multi-User Ready: Extend SESSIONS with Redis for production
+## Development Tools
 
-# Development
-bash
-**Install dev tools**
+```bash
+# Install dev tools
 pip install ruff black
 
-**Lint & format**
+# Lint and format
 ruff check . && black .
+```
 
-**Run both services**
-**Terminal 1: uvicorn main:app --reload**
-**Terminal 2: streamlit run frontend.py**
+# Streamlit Frontend Features
+**File Uploader:** Upload PDFs directly to the backend.
 
-**Streamlit Frontend**
-The frontend.py provides:
+**Session ID:** Keep track of the current active session.
 
-File uploader for PDFs
+**Chat Interface:** Interactive chat window with a send button.
 
-Session ID display
-
-Chat interface with send button
-
-Clear session button
-
-Response streaming
+**Streaming:** Real-time response rendering for a smoother experience.
