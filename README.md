@@ -1,7 +1,7 @@
-**PDF-Query-Bot**
+# PDF-Query-Bot
 A lightweight RAG chatbot for querying your PDFs using Gemini models. Upload a PDF, get a session ID, and chat with your document via simple POST endpoints. Built with FastAPI backend, LangGraph for stateful conversations, and Streamlit frontend.
 
-**Features**
+# Features
 PDF to RAG: Converts uploaded PDFs to Chroma vector store with Gemini embeddings
 
 Session-Based Chat: In-memory session management with conversation history
@@ -24,7 +24,7 @@ pip install streamlit fastapi python-multipart python-dotenv langchain-google-ge
 
 bash
 cp .env.example .env
-# Add your GOOGLE_API_KEY to .env
+**Add your GOOGLE_API_KEY to .env**
 
 2. Run Backend
 bash
@@ -38,24 +38,24 @@ Visit http://localhost:8501 to start querying PDFs!
 *API Usage*
 
 bash
-# 1. Upload PDF
+**1. Upload PDF**
 curl -X POST -F "file=@document.pdf" http://localhost:8000/upload_pdf
-# Returns: {"session_id": 123456, "message": "PDF processed successfully."}
+**Returns: {"session_id": 123456, "message": "PDF processed successfully."}**
 
-# 2. Chat
+**2. Chat**
 curl -X POST "http://localhost:8000/chat" \
   -d "session_id=123456" \
   -d "query=What is the main topic?"
 
-# 3. Reset session
+**3. Reset session**
 curl -X POST "http://localhost:8000/reset" -d "session_id=123456"
 
-# How It Works
+**How It Works**
 Upload PDF → Creates Chroma vectorstore from chunks (1200 chars, 150 overlap)
 
 Session Created → Stores db, graph, messages in SESSIONS[session_id]
 
-# Chat Flow:
+**Chat Flow:**
 
 text
 Query → retrieve_context() → answer_query() → Response
@@ -77,19 +77,19 @@ Reset: POST /reset clears specific session
 
 Multi-User Ready: Extend SESSIONS with Redis for production
 
-**Development**
+# Development
 bash
-# Install dev tools
+**Install dev tools**
 pip install ruff black
 
-# Lint & format
+**Lint & format**
 ruff check . && black .
 
-# Run both services
-# Terminal 1: uvicorn main:app --reload
-# Terminal 2: streamlit run frontend.py
+**Run both services**
+**Terminal 1: uvicorn main:app --reload**
+**Terminal 2: streamlit run frontend.py**
 
-# Streamlit Frontend
+**Streamlit Frontend**
 The frontend.py provides:
 
 File uploader for PDFs
@@ -101,7 +101,3 @@ Chat interface with send button
 Clear session button
 
 Response streaming
-
-
-📄 License
-MIT License © 2026 Karthik S R
